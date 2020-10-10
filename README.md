@@ -2,9 +2,63 @@
 
 Ce projet implémente une API minimale pour requêter les données DVF de la DGFiP stockées dans une base locale postgresql.
 
-## Installation
+## Installation des dépendances
+
+Pour Debian/Ubuntu :
+
+`sudo apt install -y postgis gcc`
+
+Selon la version de Postgresql installée (9.6 sur Debian stretch, 11 sur Debian buster, ...) :
+
+`sudo apt install -y postgresql-server-dev-<version>`
+
+Pour trouver la version de Postgresql installée :
+
+`ls /etc/postgresql`
+
+Selon la version de Python installée :
+
+`sudo apt install -y python<version>-dev`
+
+(Optionnel) Installation de virtualenv pour isoler l'installation du sytème :
+
+```
+sudo apt install -y virtualenvwrapper
+source /etc/bash_completion.d/virtualenvwrapper
+mkvirtualenv -p $(which python3) dvf_as_api
+workon dvf_as_api
+setvirtualenvproject
+```
+
+Installation des dépendances Python :
 
 `pip install -r requirements.txt`
+
+## Configuration de la base de données
+
+Création d'un role et de la base de données :
+
+```
+export PASSWORD=$(apg -a 1 -M n -n 1 -m 8)
+export DBNAME=dvf_as_api_db
+export DBUSER=dvf_as_api_user
+
+echo "127.0.0.1:5432:$DBNAME:$DBUSER:$PASSWORD" >> ~/.pgpass
+chmod 0600 ~/.pgpass
+sudo -u postgres psql -c "CREATE ROLE $DBUSER WITH PASSWORD '$PASSWORD' LOGIN;"
+sudo -u postgres psql -c "CREATE DATABASE $DBNAME WITH OWNER $DBUSER;"
+sudo -u postgres psql $DBNAME -c "CREATE EXTENSION postgis;"
+```
+Pour effacer les données et repartir à 0 :
+
+```
+export DBNAME=dvf_as_api_db
+export DBUSER=dvf_as_api_user
+
+sudo -u postgres psql -c "DROP DATABASE $DBNAME;"
+sudo -u postgres psql -c "CREATE DATABASE $DBNAME WITH OWNER $DBUSER;"
+sudo -u postgres psql $DBNAME -c "CREATE EXTENSION postgis;"
+```
 
 ## Chargement des données
 
@@ -14,13 +68,17 @@ Téléchargement des données :
 
 Import des données dans postgresql :
 
-`./dvf_import.sh MILLESIME`
+`DBNAME=dvf_as_api_db DBUSER=dvf_as_api_user ./dvf_import.sh MILLESIME`
 
-Exemple:  `./dvf_import.sh 201910`
+Exemple:  `DBNAME=dvf_as_api_db DBUSER=dvf_as_api_user ./dvf_import.sh 201910`
 
 ## Lancement du serveur
 
 `gunicorn dvf_as_api:app -b 0.0.0.0:8888`
+
+(Optionnel) Si l'installation a été faite dans un virtualenv :
+
+`~/.virtualenvs/dvf_as_api/bin/gunicorn dvf_as_api:app -b 0.0.0.0:8888`
 
 ## Paramètres reconnus par l'API
 
