@@ -4,9 +4,12 @@
 import falcon
 import psycopg2
 
+PSYCOPG_PARAMS = "host=127.0.0.1 user=dvf_as_api_user dbname=dvf_as_api_db"
+
+
 class dgfip_dvf(object):
     def getDVF(self, req, resp):
-        db = psycopg2.connect("")  # connexion à la base PG locale
+        db = psycopg2.connect(PSYCOPG_PARAMS)
         cur = db.cursor()
 
         where = ''
