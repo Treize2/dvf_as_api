@@ -116,7 +116,7 @@ done
 FINAL_STEP_SQL="CREATE TABLE dvf_parcelles_$MILLESIME
      AS SELECT id, lon, lat FROM dvf_parcelles_tmp GROUP BY 1,2,3 ORDER BY id;"
      
-echo "1/12 -CREATING dvf_parcelles_$MILLESIME TABLE"
+echo "1/12 - CREATING dvf_parcelles_$MILLESIME TABLE"
 $PSQL_COMMAND -c "$FINAL_STEP_SQL"
 
 FINAL_STEP_SQL="DROP TABLE dvf_parcelles_tmp;"
