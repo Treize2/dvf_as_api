@@ -96,7 +96,7 @@ DVF_TMP_CLEANUP_SQL="
   -- remise en forme des dates au format ISO (AAAA-MM-JJ)
   update dvf_tmp set date_mutation = regexp_replace(date_mutation, '(..)/(..)/(....)','\3-\2-\1' ) where date_mutation ~ '../../....';
 "
-
+echo "Remise en forme des code_commune, code_postal et numero_plan"
 $PSQL_COMMAND -c "$DVF_TMP_CLEANUP_SQL"
 
 # import des localisations de parcelles (fichiers etalab)
