@@ -2,7 +2,7 @@
 DEFAULT_MILLESIME=2020-04
 
 MILLESIME=${1:-$DEFAULT_MILLESIME}
-CQUEST_MILLESIME=(echo $MILLESIME | sed 's/-//g')
+CQUEST_MILLESIME=$(echo $MILLESIME|sed 's/-//g')
 
 mkdir -p data
 cd data
