@@ -102,6 +102,7 @@ $PSQL_COMMAND -c "$DVF_TMP_CLEANUP_SQL"
 # import des localisations de parcelles (fichiers etalab)
 for f in data/*-full.csv.gz
 do
+    echo "Import $f"
     zcat $f | csvcut -c id_parcelle,longitude,latitude | $PSQL_COMMAND -c "COPY dvf_parcelles_tmp FROM stdin WITH (FORMAT csv, header true)"
 done
 
