@@ -78,6 +78,12 @@ do
     zcat $f|sed 's/,\([0-9]\)/.\1/g' | $PSQL_COMMAND -c "copy dvf_tmp from stdin with (format csv, delimiter '|', header true)"
 done
 
+for f in data/valeursfoncieres-*.txt
+do
+    echo "Import $f"
+    cat $f|sed 's/,\([0-9]\)/.\1/g' | $PSQL_COMMAND -c "copy dvf_tmp from stdin with (format csv, delimiter '|', header true)"
+done
+
 # Remise en forme des code_commune, code_postal et numero_plan
 DVF_TMP_CLEANUP_SQL="
   -- remise en forme des code_commune, code_postal, et numero_plan
