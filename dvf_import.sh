@@ -110,53 +110,56 @@ done
 FINAL_STEP_SQL="CREATE TABLE dvf_parcelles_$MILLESIME
      AS SELECT id, lon, lat FROM dvf_parcelles_tmp GROUP BY 1,2,3 ORDER BY id;"
      
-echo "CREATING dvf_parcelles_$MILLESIME TABLE"
+echo "1/12 -CREATING dvf_parcelles_$MILLESIME TABLE"
 $PSQL_COMMAND -c "$FINAL_STEP_SQL"
 
 FINAL_STEP_SQL="DROP TABLE dvf_parcelles_tmp;"
   
-echo "DROP TABLE dvf_parcelles_tmp;"
+echo "2/12 - DROP TABLE dvf_parcelles_tmp;"
 $PSQL_COMMAND -c "$FINAL_STEP_SQL"
 
 FINAL_STEP_SQL="CREATE INDEX ON dvf_parcelles_$MILLESIME USING brin(id); -- index BRIN car table trié sur id de parcelle"
 
-echo "CREATE INDEX ON dvf_parcelles_$MILLESIME"
+echo "3/12 - CREATE INDEX ON dvf_parcelles_$MILLESIME"
 $PSQL_COMMAND -c "$FINAL_STEP_SQL"
 
 #-- ajout géométrie postgis et index  
 FINAL_STEP_SQL="ALTER TABLE dvf_parcelles_$MILLESIME ADD geom geometry(point);"
-echo "ALTER TABLE dvf_parcelles_$MILLESIME"
+echo "4/12 - ALTER TABLE dvf_parcelles_$MILLESIME"
 $PSQL_COMMAND -c "$FINAL_STEP_SQL"
 
 FINAL_STEP_SQL="UPDATE dvf_parcelles_$MILLESIME SET geom = ST_MakePoint(lon,lat);"
-echo "UPDATE dvf_parcelles_$MILLESIME"
+echo "5/12 - UPDATE dvf_parcelles_$MILLESIME"
 $PSQL_COMMAND -c "$FINAL_STEP_SQL"
 
 FINAL_STEP_SQL="CREATE INDEX ON dvf_parcelles_$MILLESIME USING gist (geom);"
-echo "CREATE INDEX ON dvf_parcelles_$MILLESIME"
+echo "6/12 - CREATE INDEX ON dvf_parcelles_$MILLESIME"
 $PSQL_COMMAND -c "$FINAL_STEP_SQL"
   
 # table dvf_geo
 FINAL_STEP_SQL="CREATE TABLE dvf_geo_$MILLESIME
       AS SELECT d.*, lat, lon FROM dvf_tmp d LEFT JOIN dvf_parcelles_$MILLESIME p ON (id=numero_plan) order by numero_plan;"
-echo "CREATE TABLE dvf_geo_$MILLESIME"
+echo "7/12 - CREATE TABLE dvf_geo_$MILLESIME"
 $PSQL_COMMAND -c "$FINAL_STEP_SQL"    
 
 FINAL_STEP_SQL="DROP TABLE dvf_tmp;"
-echo "DROP TABLE dvf_tmp;"
+echo "8/12 - DROP TABLE dvf_tmp;"
 $PSQL_COMMAND -c "$FINAL_STEP_SQL"    
 
-  
-FINAL_STEP_SQL="CREATE INDEX ON dvf_geo_$MILLESIME USING GIST (numero_plan);"
+ FINAL_STEP_SQL="CREATE INDEX ON dvf_geo_$MILLESIME USING GIST (numero_plan);"
+echo "9/12 - CREATE INDEX"
 $PSQL_COMMAND -c "$FINAL_STEP_SQL" 
 FINAL_STEP_SQL="CREATE INDEX ON dvf_geo_$MILLESIME USING GIST (code_postal);"
+echo "10/12 - CREATE INDEX"
 $PSQL_COMMAND -c "$FINAL_STEP_SQL" 
   
 # vues pour le millésime courant
 FINAL_STEP_SQL="CREATE OR REPLACE VIEW dvf_geo AS SELECT * FROM dvf_geo_$MILLESIME;"
+echo "11/12 - CREATE OR REPLACE VIEW"
 $PSQL_COMMAND -c "$FINAL_STEP_SQL" 
 
 FINAL_STEP_SQL="CREATE OR REPLACE VIEW dvf_parcelles AS SELECT * FROM dvf_parcelles_$MILLESIME;"
+echo "12/12 - CREATE OR REPLACE VIEW"
 $PSQL_COMMAND -c "$FINAL_STEP_SQL" 
 
 echo "END OF FINAL_STEPS_SQL"
