@@ -67,7 +67,7 @@ where st_buffer(st_setsrid(st_makepoint(%s, %s),4326)::geography, %s)::geometry 
             if not query:
                 query = """
 select json_build_object('source', 'DGFIP / Demande de Valeurs Foncières',
-    'derniere_maj', '2019-04',
+    'derniere_maj', '2021-01',
     'licence', 'http://data.cquest.org/dgfip_dvf/conditions-generales-dutilisation.pdf',
     'nb_resultats', count(r),
     'resultats',array_to_json(array_agg(r)))::text
