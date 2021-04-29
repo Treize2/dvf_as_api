@@ -45,7 +45,7 @@ class dgfip_dvf(object):
 
         lat = req.params.get('lat', None)
         lon = req.params.get('lon', None)
-        dist = min(int(req.params.get('dist',500)),1000)
+        dist = min(int(req.params.get('dist',500)),50000)
 
         if lat and lon:  # recherche géographique
             query = cur.mogrify("""
